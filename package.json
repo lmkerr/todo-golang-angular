@@ -1,0 +1,25 @@
+{
+  "name": "@apportunities/todo-golang-angular",
+  "version": "1.0.0",
+  "description": "GoLang and Agular ToDo list",
+  "main": "index.js",
+  "scripts": {
+    "start-ui": "cd todo-ui && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmkerr/todo-golang-angular.git"
+  },
+  "keywords": [
+    "ToDo",
+    "Interview",
+    "GoLang",
+    "Angular"
+  ],
+  "author": "Loren M. Kerr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lmkerr/todo-golang-angular/issues"
+  },
+  "homepage": "https://github.com/lmkerr/todo-golang-angular#readme"
+}
