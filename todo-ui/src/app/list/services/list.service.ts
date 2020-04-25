@@ -4,17 +4,22 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ListService {
-  constructor(private _client: HttpClient) {}
+  constructor(
+    private _client: HttpClient,
+    
+    ) {}
 
   public todos$: EventEmitter<ToDo[]> = new EventEmitter<ToDo[]>();
   public todos: ToDo[] = [];
 
   public get(): Observable<ToDo[]> {
-    return this._client.get('../../../assets/data/list.data.json').pipe(
+    return this._client.get(environment.apiBaseUrl + 'todos').pipe(
       map((response: ToDo[]) => {
         // Update todos and return;
         this.todos$.next(response);
