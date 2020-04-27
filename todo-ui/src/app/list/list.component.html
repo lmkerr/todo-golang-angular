@@ -1,10 +1,11 @@
 <div class="list-content">
-  <div class="action-bar">
-    <button type="button" aria-label="Add Task" mat-fab color="accent">
+  <div class="action-bar" fxLayout="row" fxLayoutAlign="end end">
+    <button type="button" aria-label="Add Task" mat-fab color="accent" (click)="openAddDialog()">
       <mat-icon aria-label="Side nav toggle icon">add</mat-icon>
     </button>
   </div>
   <table mat-table [dataSource]="todos" class="full-width mat-elevation-z8">
+    
     <!-- Priority Column -->
     <ng-container matColumnDef="priority">
       <th mat-header-cell *matHeaderCellDef>Priority</th>
@@ -20,7 +21,11 @@
     <!-- Symbol Column -->
     <ng-container matColumnDef="isDone">
       <th mat-header-cell *matHeaderCellDef>Completed</th>
-      <td mat-cell *matCellDef="let element">{{ element.isdone }}</td>
+      <td mat-cell *matCellDef="let element">
+        <button mat-button color="primary" (click)="completeToDo(element.id)">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

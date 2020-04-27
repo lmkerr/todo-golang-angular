@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { ToDo } from 'src/app/models/todo.model';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
@@ -10,19 +10,36 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class ListService {
-  constructor(
-    private _client: HttpClient,
-    
-    ) {}
+  constructor(private _client: HttpClient) {}
 
-  public todos$: EventEmitter<ToDo[]> = new EventEmitter<ToDo[]>();
-  public todos: ToDo[] = [];
-
-  public get(): Observable<ToDo[]> {
+  public getAll(): Observable<ToDo[]> {
     return this._client.get(environment.apiBaseUrl + 'todos').pipe(
       map((response: ToDo[]) => {
-        // Update todos and return;
-        this.todos$.next(response);
+        return response;
+      })
+    );
+  }
+
+  public complete(todoId: string): Observable<ToDo[]> {
+    return this._client
+      .delete(environment.apiBaseUrl + 'todos/' + todoId, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods':
+            'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
+        },
+      })
+      .pipe(
+        map((response: ToDo[]) => {
+          return response;
+        })
+      );
+  }
+
+  public create(todo: ToDo): Observable<ToDo> {
+    return this._client.post(environment.apiBaseUrl + 'todos', todo).pipe(
+      map((response: ToDo) => {
         return response;
       })
     );

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"math/rand"
@@ -32,13 +33,18 @@ func main() {
 	todos = append(todos, ToDo{ID: "5", Title: "Dockerize Code", IsDone: false, Priority: 4})
 
 	// Route Handlers / Endpoints
-	r.HandleFunc("/api/todos", getToDos).Methods("GET")
-	r.HandleFunc("/api/todos/{id}", getToDo).Methods("GET")
-	r.HandleFunc("/api/todos", createToDo).Methods("POST")
-	r.HandleFunc("/api/todos/{id}", updateToDo).Methods("PUT")
-	r.HandleFunc("/api/todos/{id}", deleteToDo).Methods("DELETE")
+	r.HandleFunc("/api/todos", getToDos).Methods(http.MethodGet)
+	r.HandleFunc("/api/todos/{id}", getToDo).Methods(http.MethodGet)
+	r.HandleFunc("/api/todos", createToDo).Methods(http.MethodPost)
+	r.HandleFunc("/api/todos/{id}", updateToDo).Methods(http.MethodPut)
+	r.HandleFunc("/api/todos/{id}", deleteToDo).Methods(http.MethodDelete)
+	r.Use(mux.CORSMethodMiddleware(r))
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8000",
+		handlers.CORS(
+			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+			handlers.AllowedMethods([]string{"GET", "DELETE", "POST", "PUT", "PATCH", "HEAD", "OPTIONS"}),
+			handlers.AllowedOrigins([]string{"*"}))(r)))
 }
 
 // Get All ToDos
@@ -68,10 +74,12 @@ func getToDo(w http.ResponseWriter, r *http.Request) {
 func createToDo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
+
 	var todo ToDo
 	_ = json.NewDecoder(r.Body).Decode(&todo)
 
 	todo.ID = strconv.Itoa(rand.Intn(10000000)) // Mock ID - not safe, could duplicate id's
+	todo.Priority = len(todos) + 1
 	todo.IsDone = false
 
 	todos = append(todos, todo)
@@ -103,7 +111,9 @@ func updateToDo(w http.ResponseWriter, r *http.Request) {
 
 // Delete ToDo
 func deleteToDo(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "DELETE")
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
