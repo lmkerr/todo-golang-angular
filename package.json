@@ -4,8 +4,9 @@
   "description": "GoLang and Agular ToDo list",
   "main": "index.js",
   "scripts": {
-    "build:ui-docker": "gcloud builds submit --tag gcr.io/todo-275421/todo-ui",
-    "deploy:ui-docker": "gcloud run deploy --image gcr.io/todo-275421/ToDo --platform managed",
+    "docker": "npm-run-all -p docker:*",
+    "docker:ui": "cd todo-ui & docker build -t todo-ui . && docker run -p 4200:4200 todo-ui",
+    "docker:api": "cd todo-api & docker build -t todo-api . && docker run -p 8000:8000 todo-api",
     "start": "npm-run-all -p start:*",
     "start:ui": "cd todo-ui && npm run start",
     "start:api": "cd todo-api && go run main.go"
