@@ -15,7 +15,7 @@ import { AddTodoComponent } from './add-todo/add-todo.component';
 export class ListComponent implements OnInit {
   public todos: ToDo[] = [];
 
-  public displayedColumns: string[] = ['priority', 'title', 'isDone'];
+  public displayedColumns: string[] = ['title', 'isDone'];
 
   constructor(private _listService: ListService, private _dialog: MatDialog) {}
 

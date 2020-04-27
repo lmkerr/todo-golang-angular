@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -79,7 +80,13 @@ func createToDo(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&todo)
 
 	todo.ID = strconv.Itoa(rand.Intn(10000000)) // Mock ID - not safe, could duplicate id's
-	todo.Priority = len(todos) + 1
+
+	var sortedTodos = todos
+	sort.SliceStable(sortedTodos, func(i, j int) bool {
+		return sortedTodos[i].Priority < sortedTodos[j].Priority
+	})
+
+	todo.Priority = sortedTodos[len(todos)-1].Priority + 1
 	todo.IsDone = false
 
 	todos = append(todos, todo)

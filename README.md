@@ -21,6 +21,5 @@ Run: `docker run -p 8000:8000 todo-api`
 # Notes
 
 Things left to do:
-1. DELETE command enabled in CORS
-2. Connection to a live DB
-3. Deploy
+1. Connection to a live DB
+2. Deploy
