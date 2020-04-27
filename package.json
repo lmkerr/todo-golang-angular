@@ -2,7 +2,6 @@
   "name": "@apportunities/todo-golang-angular",
   "version": "1.0.0",
   "description": "GoLang and Agular ToDo list",
-  "main": "index.js",
   "scripts": {
     "docker": "npm-run-all -p docker:*",
     "docker:ui": "cd todo-ui & docker build -t todo-ui . && docker run -p 4200:4200 todo-ui",
