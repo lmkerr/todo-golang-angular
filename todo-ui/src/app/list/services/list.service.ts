@@ -22,7 +22,7 @@ export class ListService {
 
   public complete(todoId: string): Observable<ToDo[]> {
     return this._client
-      .delete(environment.apiBaseUrl + 'todos/' + todoId, {
+      .patch(environment.apiBaseUrl + 'todos/' + todoId, {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods':

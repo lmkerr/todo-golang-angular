@@ -37,7 +37,7 @@ func main() {
 	r.HandleFunc("/api/todos/{id}", getToDo).Methods(http.MethodGet)
 	r.HandleFunc("/api/todos", createToDo).Methods(http.MethodPost)
 	r.HandleFunc("/api/todos/{id}", updateToDo).Methods(http.MethodPut)
-	r.HandleFunc("/api/todos/{id}", deleteToDo).Methods(http.MethodDelete)
+	r.HandleFunc("/api/todos/{id}", completeToDo).Methods(http.MethodPatch)
 	r.Use(mux.CORSMethodMiddleware(r))
 
 	log.Fatal(http.ListenAndServe(":8000",
@@ -110,10 +110,10 @@ func updateToDo(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete ToDo
-func deleteToDo(w http.ResponseWriter, r *http.Request) {
+func completeToDo(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "DELETE")
+	w.Header().Set("Access-Control-Allow-Methods", "PATCH")
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
