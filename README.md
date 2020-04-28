@@ -6,6 +6,8 @@ To run code locally without docker, just run `npm i` from the `todo-ui` repo and
 
 Quick Command: `npm run docker`
 
+** NOTE:  Haven't yet setup docker to handle environment variables. If you want to build UI docker for production, navigate to the Dockerfile and change `RUN npm run build` to `RUN npm run build:prod`.  
+
 # UI Docker
 
 - Navigate: `cd todo-ui`
