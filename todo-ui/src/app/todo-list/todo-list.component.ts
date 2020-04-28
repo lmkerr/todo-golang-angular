@@ -3,21 +3,21 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 /* Internal */
 import { ToDo } from '../models/todo.model';
-import { ListService } from './services/list.service';
+import { ToDoListService } from './services/todo-list.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTodoComponent } from './add-todo/add-todo.component';
 
 @Component({
-  selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.scss'],
+  selector: 'app-todo-list',
+  templateUrl: './todo-list.component.html',
+  styleUrls: ['./todo-list.component.scss'],
 })
-export class ListComponent implements OnInit {
+export class ToDoListComponent implements OnInit {
   public todos: ToDo[] = [];
 
   public displayedColumns: string[] = ['title', 'isDone'];
 
-  constructor(private _listService: ListService, private _dialog: MatDialog) {}
+  constructor(private _listService: ToDoListService, private _dialog: MatDialog) {}
 
   public ngOnInit(): void {
     this._getAndSortToDos();

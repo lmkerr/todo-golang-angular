@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class ListService {
+export class ToDoListService {
   constructor(private _client: HttpClient) {}
 
   public getAll(): Observable<ToDo[]> {
