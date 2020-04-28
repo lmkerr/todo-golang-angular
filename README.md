@@ -23,3 +23,8 @@ Run: `docker run -p 8000:8000 todo-api`
 Things left to do:
 1. Connection to a live DB
 2. Deploy
+
+# GCloud Commands
+
+- UI: `glcoud builds submit --tag gcr.io/todo-275421/todo-ui`
+- API: `glcoud builds submit --tag gcr.io/todo-275421/todo-api`
