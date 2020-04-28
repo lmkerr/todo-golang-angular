@@ -1,23 +1,32 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"log"
-	"math/rand"
+	// "math/rand"
 	"net/http"
-	"sort"
 	"strconv"
 )
 
 // ToDo Struct (MODEL)
 type ToDo struct {
-	ID       string `json:"id"`
+	ID       int    `json:"id"`
 	Title    string `json:"title"`
 	IsDone   bool   `json:"is_done"`
 	Priority int    `json:"priority"`
 }
+
+// DB Connection Data - @todo Get this out of code...
+const (
+	DB_USER     = "app-user"
+	DB_PASSWORD = "HireMePlease!"
+	DB_NAME     = "todo"
+)
 
 // Init ToDos var as a slice ToDo struct
 var todos []ToDo
@@ -26,18 +35,10 @@ func main() {
 	// Init Router
 	r := mux.NewRouter()
 
-	// Mock Data - @todo - implement DB
-	todos = append(todos, ToDo{ID: "1", Title: "Code Front-End", IsDone: false, Priority: 1})
-	todos = append(todos, ToDo{ID: "2", Title: "Build Database", IsDone: false, Priority: 3})
-	todos = append(todos, ToDo{ID: "3", Title: "Deploy Code", IsDone: false, Priority: 5})
-	todos = append(todos, ToDo{ID: "4", Title: "Code Back-End", IsDone: false, Priority: 2})
-	todos = append(todos, ToDo{ID: "5", Title: "Dockerize Code", IsDone: false, Priority: 4})
-
 	// Route Handlers / Endpoints
 	r.HandleFunc("/api/todos", getToDos).Methods(http.MethodGet)
 	r.HandleFunc("/api/todos/{id}", getToDo).Methods(http.MethodGet)
 	r.HandleFunc("/api/todos", createToDo).Methods(http.MethodPost)
-	r.HandleFunc("/api/todos/{id}", updateToDo).Methods(http.MethodPut)
 	r.HandleFunc("/api/todos/{id}", completeToDo).Methods(http.MethodPatch)
 	r.Use(mux.CORSMethodMiddleware(r))
 
@@ -52,7 +53,26 @@ func main() {
 func getToDos(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(todos)
+
+	dbinfo := fmt.Sprintf("postgres://app-user:HireMePlease!@35.194.7.68/postgres?sslmode=verify-full",
+		DB_USER, DB_PASSWORD, DB_NAME)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	defer db.Close()
+
+	fmt.Println("# Querying")
+	rows, err := db.Query("SELECT * FROM todos WHERE done = false")
+	checkErr(err)
+
+	var data []ToDo
+	for rows.Next() {
+		var todo ToDo
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.IsDone, &todo.Priority)
+		checkErr(err)
+		data = append(data, todo)
+	}
+
+	json.NewEncoder(w).Encode(data)
 }
 
 // Get ToDo
@@ -60,15 +80,25 @@ func getToDo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
+	dbinfo := fmt.Sprintf("postgres://app-user:HireMePlease!@35.194.7.68/postgres?sslmode=verify-full",
+		DB_USER, DB_PASSWORD, DB_NAME)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	defer db.Close()
+
 	params := mux.Vars(r) // Get params
-	// Loop through todos and find with id
-	for _, item := range todos {
-		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
+
+	var todo ToDo
+	i, err := strconv.Atoi(params["id"])
+	todo.ID = i
+	rows, err := db.Query("SELECT id, title, done, priority FROM todos WHERE ID = $1", todo.ID)
+	checkErr(err)
+
+	for rows.Next() {
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.IsDone, &todo.Priority)
+		checkErr(err)
 	}
-	json.NewEncoder(w).Encode(&ToDo{})
+	json.NewEncoder(w).Encode(todo)
 }
 
 // Create ToDo
@@ -79,44 +109,34 @@ func createToDo(w http.ResponseWriter, r *http.Request) {
 	var todo ToDo
 	_ = json.NewDecoder(r.Body).Decode(&todo)
 
-	todo.ID = strconv.Itoa(rand.Intn(10000000)) // Mock ID - not safe, could duplicate id's
-
-	var sortedTodos = todos
-	sort.SliceStable(sortedTodos, func(i, j int) bool {
-		return sortedTodos[i].Priority < sortedTodos[j].Priority
-	})
-
-	todo.Priority = sortedTodos[len(todos)-1].Priority + 1
 	todo.IsDone = false
 
-	todos = append(todos, todo)
+	dbinfo := fmt.Sprintf("postgres://app-user:HireMePlease!@35.194.7.68/postgres?sslmode=verify-full",
+		DB_USER, DB_PASSWORD, DB_NAME)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	defer db.Close()
+
+	rows, err := db.Query(`insert into todos (title, done, priority)
+			values ($1, $2, (
+				SELECT
+					CASE 
+						WHEN EXISTS (SELECT 1 FROM todos) THEN (select max(priority) + 1 from todos) 
+						ELSE 1
+					end
+			))
+			returning *`,
+		todo.Title, todo.IsDone)
+	checkErr(err)
+
+	for rows.Next() {
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.IsDone, &todo.Priority)
+		checkErr(err)
+	}
 	json.NewEncoder(w).Encode(todo)
 }
 
-// Update ToDo
-func updateToDo(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-
-	params := mux.Vars(r)
-	for index, item := range todos {
-		if item.ID == params["id"] {
-
-			todos = append(todos[:index], todos[index+1:]...)
-
-			var todo = item
-			_ = json.NewDecoder(r.Body).Decode(&todo)
-
-			todo.ID = item.ID
-
-			todos = append(todos, todo)
-			json.NewEncoder(w).Encode(todo)
-			return
-		}
-	}
-}
-
-// Delete ToDo
+// Complete ToDo
 func completeToDo(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -124,12 +144,27 @@ func completeToDo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
-	for index, item := range todos {
-		if item.ID == params["id"] {
-			todos = append(todos[:index], todos[index+1:]...)
-			break
-		}
+
+	dbinfo := fmt.Sprintf("postgres://app-user:HireMePlease!@35.194.7.68/postgres?sslmode=verify-full",
+		DB_USER, DB_PASSWORD, DB_NAME)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	defer db.Close()
+
+	rows, err := db.Query("UPDATE todos SET done = true WHERE id = $1", params["id"])
+	checkErr(err)
+
+	var todo ToDo
+	for rows.Next() {
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.IsDone, &todo.Priority)
+		checkErr(err)
 	}
 
-	json.NewEncoder(w).Encode(todos)
+	json.NewEncoder(w).Encode(todo)
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

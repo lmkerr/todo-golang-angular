@@ -24,8 +24,8 @@ export class ToDoListComponent implements OnInit {
   }
 
   public completeToDo(todoId: string): void {
-    this._listService.complete(todoId).subscribe((data: ToDo[]) => {
-      this.todos = data.sort((a, b) => (a.priority > b.priority ? 1 : -1));
+    this._listService.complete(todoId).subscribe((soimething: any) => {
+      this._getAndSortToDos()     
     });
   }
 
@@ -38,7 +38,7 @@ export class ToDoListComponent implements OnInit {
 
   private _getAndSortToDos(): void {
     this._listService.getAll().subscribe((data: ToDo[]) => {
-      this.todos = data.sort((a, b) => (a.priority > b.priority ? 1 : -1));
+      this.todos = data ? data.sort((a, b) => (a.priority > b.priority ? 1 : -1)) : [];
     });
   }
 }
