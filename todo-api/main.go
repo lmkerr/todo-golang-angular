@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"log"
-	// "math/rand"
 	"net/http"
 	"strconv"
 )
