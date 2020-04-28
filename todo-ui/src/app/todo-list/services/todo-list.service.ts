@@ -20,7 +20,7 @@ export class ToDoListService {
     );
   }
 
-  public complete(todoId: string): Observable<ToDo[]> {
+  public complete(todoId: string): Observable<any> {
     return this._client
       .patch(environment.apiBaseUrl + 'todos/' + todoId, {
         headers: {
@@ -31,7 +31,7 @@ export class ToDoListService {
         },
       })
       .pipe(
-        map((response: ToDo[]) => {
+        map((response: any) => {
           return response;
         })
       );
