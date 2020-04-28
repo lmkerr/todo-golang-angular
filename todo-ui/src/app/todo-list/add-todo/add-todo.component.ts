@@ -2,7 +2,7 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ListService } from '../services/list.service';
+import { ToDoListService } from '../services/todo-list.service';
 import { ToDo } from 'src/app/models/todo.model';
 
 @Component({
@@ -17,7 +17,7 @@ export class AddTodoComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private _dialog: MatDialog,
-    private _listService: ListService
+    private _todoListService: ToDoListService
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +36,7 @@ export class AddTodoComponent implements OnInit {
 
   public save(): void {
     const todo = this.todoForm.value as ToDo;
-    this._listService.create(todo).subscribe((data: ToDo) => {
+    this._todoListService.create(todo).subscribe((data: ToDo) => {
       this.saved$.emit(data);
       this._dialog.closeAll();
     });

@@ -2,12 +2,18 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="false">
-    <mat-toolbar>Menu</mat-toolbar>
+      (click)="drawer.toggle()">
+    <mat-toolbar>Loren M. Kerr</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item href="#">Link 1</a>
-      <a mat-list-item href="#">Link 2</a>
-      <a mat-list-item href="#">Link 3</a>
+      <a mat-list-item href="assets/files/resume.pdf" target="_blank">
+        <mat-icon>picture_as_pdf</mat-icon>Resume
+      </a>
+      <a mat-list-item href="https://www.github.com/lmkerr" target="_blank">
+        <mat-icon svgIcon="github"></mat-icon>GitHub
+      </a>
+      <a mat-list-item href="https://www.linkedin.com/in/lorenkerr"target="_blank">
+        <mat-icon svgIcon="linkedin"></mat-icon>LinkedIn
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -15,13 +21,14 @@
       <button
         type="button"
         aria-label="Toggle sidenav"
-        mat-icon-button>
+        mat-icon-button
+        (click)="drawer.toggle()">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>ToDo - By Loren M. Kerr</span>
     </mat-toolbar>
     <!-- Add Content Here -->
-    <app-list></app-list>
+    <app-todo-list></app-todo-list>
 
   </mat-sidenav-content>
 </mat-sidenav-container>

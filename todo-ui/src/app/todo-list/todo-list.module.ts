@@ -15,14 +15,14 @@ import { MatInputModule } from '@angular/material/input';
 
 
 /* Internal */
-import { ListComponent } from './list.component';
-import { ListService } from './services/list.service';
+import { ToDoListComponent } from './todo-list.component';
+import { ToDoListService } from './services/todo-list.service';
 import { AddTodoComponent } from './add-todo/add-todo.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 
 @NgModule({
-  declarations: [ListComponent, AddTodoComponent],
+  declarations: [ToDoListComponent, AddTodoComponent],
   imports: [
     CommonModule,
     FlexLayoutModule,
@@ -41,10 +41,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatTableModule,    
   ],
   exports: [
-    ListComponent,
+    ToDoListComponent,
   ],
   providers: [
-    ListService,
+    ToDoListService,
   ]
 })
-export class ListModule { }
+export class ToDoListModule { }
