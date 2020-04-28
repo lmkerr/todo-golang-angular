@@ -17,7 +17,10 @@ export class ToDoListComponent implements OnInit {
 
   public displayedColumns: string[] = ['title', 'isDone'];
 
-  constructor(private _listService: ToDoListService, private _dialog: MatDialog) {}
+  constructor(
+    private _listService: ToDoListService,
+    private _dialog: MatDialog
+  ) {}
 
   public ngOnInit(): void {
     this._getAndSortToDos();
@@ -25,7 +28,7 @@ export class ToDoListComponent implements OnInit {
 
   public completeToDo(todoId: string): void {
     this._listService.complete(todoId).subscribe((soimething: any) => {
-      this._getAndSortToDos()     
+      this._getAndSortToDos();
     });
   }
 
@@ -38,7 +41,9 @@ export class ToDoListComponent implements OnInit {
 
   private _getAndSortToDos(): void {
     this._listService.getAll().subscribe((data: ToDo[]) => {
-      this.todos = data ? data.sort((a, b) => (a.priority > b.priority ? 1 : -1)) : [];
+      this.todos = data
+        ? data.sort((a, b) => (a.priority > b.priority ? 1 : -1))
+        : [];
     });
   }
 }
